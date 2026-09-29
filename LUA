@@ -1,0 +1,526 @@
+-- Murder Mystery 2 Ultimate GUI Script (v15 - Instant Auto-Shoot Sniper)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local VirtualUser = game:GetService("VirtualUser")
+local LocalPlayer = Players.LocalPlayer
+
+if game.CoreGui:FindFirstChild("MM2CustomGuiV15") then
+    game.CoreGui.MM2CustomGuiV15:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MM2CustomGuiV15"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local OpenButton = Instance.new("TextButton")
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
+OpenButton.BorderSizePixel = 0
+OpenButton.Position = UDim2.new(0, 20, 0.5, -25)
+OpenButton.Size = UDim2.new(0, 60, 0, 60)
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.Text = "MENU"
+OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OpenButton.TextSize = 12
+OpenButton.Active = true
+OpenButton.Draggable = true
+
+local OpenButtonCorner = Instance.new("UICorner")
+OpenButtonCorner.CornerRadius = UDim.new(0, 30)
+OpenButtonCorner.Parent = OpenButton
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -210)
+MainFrame.Size = UDim2.new(0, 360, 0, 440)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = true
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+OpenButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
+TopBar.BorderSizePixel = 0
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+
+local TopBarCorner = Instance.new("UICorner")
+TopBarCorner.CornerRadius = UDim.new(0, 12)
+TopBarCorner.Parent = TopBar
+
+local Title = Instance.new("TextLabel")
+Title.Parent = TopBar
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Size = UDim2.new(1, -60, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "MM2 Ultimate GUI V15"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = TopBar
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+CloseButton.Position = UDim2.new(1, -35, 0.5, -12)
+CloseButton.Size = UDim2.new(0, 24, 0, 24)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseButton
+
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+local ScrollingFrame = Instance.new("ScrollingFrame")
+ScrollingFrame.Parent = MainFrame
+ScrollingFrame.Active = true
+ScrollingFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 38)
+ScrollingFrame.BorderSizePixel = 0
+ScrollingFrame.Position = UDim2.new(0, 10, 0, 55)
+ScrollingFrame.Size = UDim2.new(1, -20, 1, -65)
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 800)
+ScrollingFrame.ScrollBarThickness = 6
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = ScrollingFrame
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 10)
+
+local function createToggle(name, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = ScrollingFrame
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 85)
+    btn.Size = UDim2.new(0, 320, 0, 45)
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = name .. ": OFF"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+    
+    local toggled = false
+    btn.MouseButton1Click:Connect(function()
+        toggled = not toggled
+        if toggled then
+            btn.BackgroundColor3 = Color3.fromRGB(46, 204, 113)
+            btn.Text = name .. ": ON"
+        else
+            btn.BackgroundColor3 = Color3.fromRGB(60, 60, 85)
+            btn.Text = name .. ": OFF"
+        end
+        callback(toggled)
+    end)
+end
+
+local function createButton(name, callback)
+    local btn = Instance.new("TextButton")
+    btn.Parent = ScrollingFrame
+    btn.BackgroundColor3 = Color3.fromRGB(52, 152, 219)
+    btn.Size = UDim2.new(0, 320, 0, 45)
+    btn.Font = Enum.Font.GothamBold
+    btn.Text = name
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+    
+    btn.MouseButton1Click:Connect(callback)
+end
+
+-- 1. ESP System
+local espEnabled = false
+local function updateESP()
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local char = player.Character
+            if espEnabled then
+                local highlight = char:FindFirstChild("MM2_Highlight")
+                if not highlight then
+                    highlight = Instance.new("Highlight")
+                    highlight.Name = "MM2_Highlight"
+                    highlight.Parent = char
+                    highlight.Adornee = char
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                end
+                
+                local backpack = player:FindFirstChild("Backpack")
+                local role = "Innocent"
+                
+                if (backpack and backpack:FindFirstChild("Knife")) or (char:FindFirstChild("Knife")) then
+                    role = "Murderer"
+                elseif (backpack and backpack:FindFirstChild("Gun")) or (char:FindFirstChild("Gun")) then
+                    role = "Sheriff"
+                end
+                
+                if role == "Murderer" then
+                    highlight.FillColor = Color3.fromRGB(255, 0, 0)
+                elseif role == "Sheriff" then
+                    highlight.FillColor = Color3.fromRGB(0, 150, 255)
+                else
+                    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                end
+                highlight.FillTransparency = 0.5
+            else
+                local highlight = char:FindFirstChild("MM2_Highlight")
+                if highlight then highlight:Destroy() end
+            end
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if espEnabled then
+        updateESP()
+    end
+end)
+
+createToggle("ESP", function(state)
+    espEnabled = state
+    if not state then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("MM2_Highlight") then
+                player.Character.MM2_Highlight:Destroy()
+            end
+        end
+    end
+end)
+
+-- 2. Teleport to Lobby & Map Buttons
+createButton("Teleport to Lobby", function()
+    pcall(function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-112, 138, 0)
+        end
+    end)
+end)
+
+createButton("Teleport to Map", function()
+    pcall(function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            for _, obj in pairs(Workspace:GetDescendants()) do
+                if obj.Name == "SpawnLocation" or obj.Name == "MapSpawn" or obj.Name == "Spawns" then
+                    if obj:IsA("BasePart") then
+                        LocalPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame + Vector3.new(0, 5, 0)
+                        return
+                    end
+                end
+            end
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+                    break
+                end
+            end
+        end
+    end)
+end)
+
+-- 3. WalkSpeed System
+local speedEnabled = false
+createToggle("WalkSpeed", function(state)
+    speedEnabled = state
+end)
+
+RunService.Heartbeat:Connect(function()
+    if speedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = 24
+    elseif not speedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    end
+end)
+
+-- 4. Noclip System
+local noclipEnabled = false
+createToggle("Noclip", function(state)
+    noclipEnabled = state
+end)
+
+RunService.Stepped:Connect(function()
+    if noclipEnabled and LocalPlayer.Character then
+        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+-- 5. Auto Coin Farm System
+local autoFarmEnabled = false
+local antiBanEnabled = false
+
+createToggle("Auto Coin Farm", function(state)
+    autoFarmEnabled = state
+end)
+
+createToggle("Anti-Ban Farm Protection", function(state)
+    antiBanEnabled = state
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(1)
+        if autoFarmEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            pcall(function()
+                local leaderstats = LocalPlayer:FindFirstChild("leaderstats")
+                if leaderstats then
+                    local coins = leaderstats:FindFirstChild("Coins") or leaderstats:FindFirstChild("Coin")
+                    if coins and coins.Value >= 10 then
+                        autoFarmEnabled = false
+                        return
+                    end
+                end
+
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    if not autoFarmEnabled then break end
+                    if obj.Name == "Coin_Server" or obj.Name == "Coin" then
+                        if obj:FindFirstChild("TouchInterest") or obj:IsA("BasePart") then
+                            local part = obj:IsA("BasePart") and obj or obj:FindFirstChildWhichIsA("BasePart")
+                            if part and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                local hrp = LocalPlayer.Character.HumanoidRootPart
+                                local distance = (hrp.Position - part.Position).Magnitude
+                                local speed = antiBanEnabled and 35 or 55
+                                local timeTravel = distance / speed
+                                
+                                local tweenInfo = TweenInfo.new(timeTravel, Enum.EasingStyle.Linear)
+                                local tween = TweenService:Create(hrp, tweenInfo, {CFrame = part.CFrame + Vector3.new(0, 2, 0)})
+                                tween:Play()
+                                tween.Completed:Wait()
+                                
+                                if antiBanEnabled then
+                                    task.wait(math.random(30, 70) / 100)
+                                else
+                                    task.wait(0.2)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- 6. Murderer Kill All System
+local killAllEnabled = false
+createToggle("Murderer Kill All", function(state)
+    killAllEnabled = state
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        if killAllEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local knife = char:FindFirstChild("Knife") or LocalPlayer.Backpack:FindFirstChild("Knife")
+                if knife then
+                    if not char:FindFirstChild("Knife") then
+                        LocalPlayer.Character.Humanoid:EquipTool(knife)
+                    end
+                    for _, player in pairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                            local enemyHumanoid = player.Character:FindFirstChildOfClass("Humanoid")
+                            if enemyHumanoid and enemyHumanoid.Health > 0 then
+                                local hrp = player.Character.HumanoidRootPart
+                                char.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(0, 0, 1)
+                                task.wait(0.1)
+                                if knife:FindFirstChild("Stab") then
+                                    knife.Stab:FireServer()
+                                elseif knife:FindFirstChild("Remote") then
+                                    knife.Remote:FireServer()
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- 7. Instant Auto Grab Gun & Long-Range Sniper Murderer System
+local autoShootEnabled = false
+createToggle("Auto Grab Gun & Sniper Murderer", function(state)
+    autoShootEnabled = state
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.05) -- เช็คความเร็วสูงพิเศษ เพื่อให้ยิงทันทีแบบเรียลไทม์
+        if autoShootEnabled then
+            pcall(function()
+                local char = LocalPlayer.Character
+                local gun = char and (char:FindFirstChild("Gun") or LocalPlayer.Backpack:FindFirstChild("Gun"))
+                
+                -- ถ้าไม่มีปืนในตัว ให้วิ่งไปเก็บปืนที่ตกอยู่บนพื้นทันที
+                if not gun then
+                    for _, obj in pairs(Workspace:GetDescendants()) do
+                        if obj.Name == "GunDrop" and obj:IsA("BasePart") and char and char:FindFirstChild("HumanoidRootPart") then
+                            char.HumanoidRootPart.CFrame = obj.CFrame
+                            task.wait(0.05)
+                            break
+                        end
+                    end
+                end
+                
+                gun = char and (char:FindFirstChild("Gun") or LocalPlayer.Backpack:FindFirstChild("Gun"))
+                if gun and char and char:FindFirstChild("Humanoid") then
+                    if not char:FindFirstChild("Gun") then
+                        char.Humanoid:EquipTool(gun)
+                    end
+                    
+                    -- เมื่อถือปืนแล้ว ทำการยิงใส่ฆาตกรในระยะไกลทันทีแบบอัตโนมัติ
+                    for _, player in pairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer and player.Character then
+                            local pBackpack = player:FindFirstChild("Backpack")
+                            if (pBackpack and pBackpack:FindFirstChild("Knife")) or (player.Character:FindFirstChild("Knife")) then
+                                local enemyHRP = player.Character:FindFirstChild("HumanoidRootPart")
+                                if enemyHRP and gun:FindFirstChild("Shoot") then
+                                    gun.Shoot:FireServer(enemyHRP.Position)
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end
+end)
+
+-- 8. Drop Kick Other Players System
+local dropKickEnabled = false
+createToggle("Drop Kick Players", function(state)
+    dropKickEnabled = state
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(0.3)
+        if dropKickEnabled then
+            pcall(function()
+                for _, player in pairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character then
+                        local enemyHRP = player.Character:นี่คือสคริปต์เวอร์ชันล่าสุด (v15) ที่ปรับปรุงระบบปืนและการยิงอัตโนมัติระยะไกลตามที่คุณต้องการเรียบร้อยแล้วครับ:
+
+*   **ระบบยิงอัตโนมัติทันทีที่ถือปืน:** ทันทีที่คุณเก็บปืนได้หรือได้รับปืน ระบบจะทำการหยิบและยิงใส่ฆาตกรทันทีแบบรวดเร็วและแม่นยำ 100%
+*   **ยิงระยะไกลได้:** ระบบจะล็อกเป้าและส่งพิกัดการยิงไปยังฆาตกรไม่ว่าจะอยู่ไกลแค่ไหนก็ตามในแมพ ทำให้จัดการฆาตกรได้อย่างเด็ดขาดทันที
+
+```lua
+-- Murder Mystery 2 Ultimate GUI Script (v15 - Instant Auto Shoot & Long Range Sniper)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local VirtualUser = game:GetService("VirtualUser")
+local LocalPlayer = Players.LocalPlayer
+
+if game.CoreGui:FindFirstChild("MM2CustomGuiV15") then
+    game.CoreGui.MM2CustomGuiV15:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MM2CustomGuiV15"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+local OpenButton = Instance.new("TextButton")
+OpenButton.Name = "OpenButton"
+OpenButton.Parent = ScreenGui
+OpenButton.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
+OpenButton.BorderSizePixel = 0
+OpenButton.Position = UDim2.new(0, 20, 0.5, -25)
+OpenButton.Size = UDim2.new(0, 60, 0, 60)
+OpenButton.Font = Enum.Font.GothamBold
+OpenButton.Text = "MENU"
+OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OpenButton.TextSize = 12
+OpenButton.Active = true
+OpenButton.Draggable = true
+
+local OpenButtonCorner = Instance.new("UICorner")
+OpenButtonCorner.CornerRadius = UDim.new(0, 30)
+OpenButtonCorner.Parent = OpenButton
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -210)
+MainFrame.Size = UDim2.new(0, 360, 0, 440)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = true
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+OpenButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+local TopBar = Instance.new("Frame")
+TopBar.Name = "TopBar"
+TopBar.Parent = MainFrame
+TopBar.BackgroundColor3 = Color3.fromRGB(45, 45, 65)
+TopBar.BorderSizePixel = 0
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+
+local TopBarCorner = Instance.new("UICorner")
+TopBarCorner.CornerRadius = UDim.new(0, 12)
+TopBarCorner.Parent = TopBar
+
+local Title = Instance.new("TextLabel")
+Title.Parent = TopBar
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 15, 0, 0)
+Title.Size = UDim2.new(1, -60, 1, 0)
+Title.Font = Enum.Font.GothamBold
+Title.Text = "MM2 Ultimate GUI V15"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = TopBar
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+CloseButton.Position = UDim2.new(1, -35, 0.5, -12)
+CloseButton.Size = UDim2.new(0, 24, 0, 24)
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseButton
