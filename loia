@@ -1,0 +1,24 @@
+-- ตัวอย่างโค้ดสำหรับเทสสคริปต์ MM2
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
+
+local Window = OrionLib:MakeWindow({Name = "MM2 Test Script", HidePremium = false, SaveConfig = true, ConfigFolder = "MM2Test"})
+
+local Tab = Window:MakeTab({
+	Name = "หน้าหลัก (Main)",
+	Icon = "rbxassetid://4483362458",
+	PremiumOnly = false
+})
+
+Tab:AddButton({
+	Name = "กดปุ่มเพื่อเทสข้อความ",
+	Callback = function()
+      print("สคริปต์ทำงานปกติ!")
+      game.StarterGui:SetCore("SendNotification", {
+          Title = "MM2 Test",
+          Text = "เทสสคริปต์สำเร็จแล้ว!",
+          Duration = 3
+      })
+	end
+})
+
+OrionLib:Init()
